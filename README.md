@@ -1,3 +1,5 @@
+<img width="330" height="408" alt="A18F6CDC-C5FC-49CB-9797-FDE20580494C" src="https://github.com/user-attachments/assets/105e9594-2210-4492-b759-17c03b37a0b3" />
+
 # Appkeys
 
 Appkeys is a macOS menubar app that allows you to easily assign global hotkeys to your most-used apps. That's it!
