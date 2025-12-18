@@ -137,7 +137,8 @@ struct HotkeyRow: View {
 
     @State private var keyCode: UInt32?
     @State private var modifiers: UInt32
-    @State private var isHoveringDelete = false
+    @State private var activateAllWindows: Bool
+    @State private var isHoveringMenu = false
 
     init(hotkey: AppHotkey, icon: NSImage, onUpdate: @escaping (AppHotkey) -> Void, onDelete: @escaping () -> Void) {
         self.hotkey = hotkey
@@ -146,6 +147,7 @@ struct HotkeyRow: View {
         self.onDelete = onDelete
         self._keyCode = State(initialValue: hotkey.keyCode)
         self._modifiers = State(initialValue: hotkey.modifiers)
+        self._activateAllWindows = State(initialValue: hotkey.activateAllWindows)
     }
 
     var body: some View {
@@ -167,23 +169,52 @@ struct HotkeyRow: View {
                     var updated = hotkey
                     updated.keyCode = newValue
                     updated.modifiers = modifiers
+                    updated.activateAllWindows = activateAllWindows
                     onUpdate(updated)
                 }
                 .onChange(of: modifiers) { _, newValue in
                     var updated = hotkey
                     updated.keyCode = keyCode
                     updated.modifiers = newValue
+                    updated.activateAllWindows = activateAllWindows
                     onUpdate(updated)
                 }
 
-            // Delete button
-            Button(action: onDelete) {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(isHoveringDelete ? .primary : .secondary)
+            // Options menu
+            Menu {
+                Button {
+                    activateAllWindows.toggle()
+                    var updated = hotkey
+                    updated.keyCode = keyCode
+                    updated.modifiers = modifiers
+                    updated.activateAllWindows = activateAllWindows
+                    onUpdate(updated)
+                } label: {
+                    HStack {
+                        Text("Activate all windows")
+                        if activateAllWindows {
+                            Spacer()
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+
+                Divider()
+
+                Button(role: .destructive) {
+                    onDelete()
+                } label: {
+                    Text("Remove")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle.fill")
+                    .foregroundColor(isHoveringMenu ? .primary : .secondary)
             }
-            .buttonStyle(.plain)
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
             .onHover { hovering in
-                isHoveringDelete = hovering
+                isHoveringMenu = hovering
             }
         }
         .padding(.vertical, 4)

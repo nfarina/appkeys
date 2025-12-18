@@ -58,20 +58,25 @@ class AppDelegate {
             guard hotkey.hasHotkey else { continue }
 
             let appPath = hotkey.appPath
+            let activateAllWindows = hotkey.activateAllWindows
             _ = HotkeyManager.shared.register(hotkey: hotkey) {
-                launchOrFocusApp(at: appPath)
+                launchOrFocusApp(at: appPath, activateAllWindows: activateAllWindows)
             }
         }
     }
 }
 
-func launchOrFocusApp(at path: String) {
+func launchOrFocusApp(at path: String, activateAllWindows: Bool = false) {
     let url = URL(fileURLWithPath: path)
 
     // Check if app is already running
     if let bundleID = Bundle(url: url)?.bundleIdentifier,
        let runningApp = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).first {
-        runningApp.activate()
+        if activateAllWindows {
+            runningApp.activate(options: .activateAllWindows)
+        } else {
+            runningApp.activate()
+        }
     } else {
         // Launch the app
         NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration()) { _, error in

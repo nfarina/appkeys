@@ -11,12 +11,28 @@ struct AppHotkey: Codable, Identifiable, Equatable {
     var appPath: String
     var keyCode: UInt32?  // nil means no hotkey set
     var modifiers: UInt32  // Carbon modifier flags
+    var activateAllWindows: Bool  // Bring all windows to front when focusing
 
-    init(id: UUID = UUID(), appPath: String, keyCode: UInt32? = nil, modifiers: UInt32 = 0) {
+    init(id: UUID = UUID(), appPath: String, keyCode: UInt32? = nil, modifiers: UInt32 = 0, activateAllWindows: Bool = false) {
         self.id = id
         self.appPath = appPath
         self.keyCode = keyCode
         self.modifiers = modifiers
+        self.activateAllWindows = activateAllWindows
+    }
+
+    // Custom decoder for backward compatibility with existing JSON files
+    enum CodingKeys: String, CodingKey {
+        case id, appPath, keyCode, modifiers, activateAllWindows
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        appPath = try container.decode(String.self, forKey: .appPath)
+        keyCode = try container.decodeIfPresent(UInt32.self, forKey: .keyCode)
+        modifiers = try container.decode(UInt32.self, forKey: .modifiers)
+        activateAllWindows = try container.decodeIfPresent(Bool.self, forKey: .activateAllWindows) ?? false
     }
 
     var appName: String {
