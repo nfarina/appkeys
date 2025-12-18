@@ -183,11 +183,28 @@ struct HotkeyRow: View {
             // Options menu
             Menu {
                 Button {
-                    activateAllWindows.toggle()
+                    activateAllWindows = false
                     var updated = hotkey
                     updated.keyCode = keyCode
                     updated.modifiers = modifiers
-                    updated.activateAllWindows = activateAllWindows
+                    updated.activateAllWindows = false
+                    onUpdate(updated)
+                } label: {
+                    HStack {
+                        Text("Activate last window")
+                        if !activateAllWindows {
+                            Spacer()
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+
+                Button {
+                    activateAllWindows = true
+                    var updated = hotkey
+                    updated.keyCode = keyCode
+                    updated.modifiers = modifiers
+                    updated.activateAllWindows = true
                     onUpdate(updated)
                 } label: {
                     HStack {
@@ -204,7 +221,7 @@ struct HotkeyRow: View {
                 Button(role: .destructive) {
                     onDelete()
                 } label: {
-                    Text("Remove")
+                    Label("Remove", systemImage: "trash")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle.fill")
